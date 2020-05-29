@@ -83,15 +83,17 @@ def solveTwoTransistor(t_values, V_values, R, C, Js, T):
     return Vn_values, J2_values
 
 #%%
-
-t_values = sp.linspace(0, 40, 200)
-V_values = sp.concatenate([sp.zeros(30), sp.ones(170)])
+t_values = sp.linspace(0, 30, 200)
+V_values = sp.concatenate([sp.zeros(50), sp.ones(150)])
 
 Vn_values, J_values = solveTwoTransistor(t_values, V_values, 5, 1, 1e-10, 300)
 
+plt.plot(t_values, V_values)
+plt.title("applied voltage vs time")
+plt.show()
 plt.plot(t_values, Vn_values)
+plt.title("Vn vs time")
 plt.show()
 plt.plot(t_values, J_values)
+plt.title("current vs time")
 plt.show()
-
-# %%

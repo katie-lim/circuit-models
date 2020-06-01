@@ -56,9 +56,9 @@ def plotResults(t_values, V_values, q_values, V1_values, J_values):
     plt.show()
     return
 
-def solveTwoTransistor(t_values, V_values, R, C, Js, T):
+def solveTwoTransistor(t_values, V_values, R, C, Js1, Js2, T):
     # First, find the solution for the single transistor
-    q_values, V1_values, J_values = solveTransistor(t_values, V_values, R, C, Js, T)
+    q_values, V1_values, J_values = solveTransistor(t_values, V_values, R, C, Js1, T)
 
     # We must now solve for Vn(t), we use the fact that V2=q/c.
     def Vn(t):
@@ -66,7 +66,7 @@ def solveTwoTransistor(t_values, V_values, R, C, Js, T):
         for i in t:
             index.append(sp.where(t_values == i)[0][0])
 
-        return kB*T/e*sp.log((sp.exp(2*e*q_values[index]/(C*kB*T)) + sp.exp(e*(q_values[index]/C+V1_values[index])/(kB*T))) / (sp.exp(2*e*q_values[index]/(C*kB*T))+1))
+        return kB*T/e*sp.log(((Js2/Js1) * sp.exp(2*e*q_values[index]/(C*kB*T)) + sp.exp(e*(q_values[index]/C+V1_values[index])/(kB*T))) / ((Js2/Js1) * sp.exp(2*e*q_values[index]/(C*kB*T))+1))
 
     Vn_values = Vn(t_values)
 
@@ -76,7 +76,7 @@ def solveTwoTransistor(t_values, V_values, R, C, Js, T):
         for i in t:
             index.append(sp.where(t_values == i)[0][0])
 
-        return Js*(sp.exp(e*q_values[index]/(C*kB*T))-sp.exp(e*(q_values[index]/C-Vn_values[index])/(kB*T)))
+        return Js2*(sp.exp(e*q_values[index]/(C*kB*T))-sp.exp(e*(q_values[index]/C-Vn_values[index])/(kB*T)))
 
     J2_values = transJ2(t_values)
 
@@ -86,7 +86,7 @@ def solveTwoTransistor(t_values, V_values, R, C, Js, T):
 t_values = sp.linspace(0, 30, 200)
 V_values = sp.concatenate([sp.zeros(50), sp.ones(150)])
 
-Vn_values, J_values = solveTwoTransistor(t_values, V_values, 5, 1, 1e-10, 300)
+Vn_values, J_values = solveTwoTransistor(t_values, V_values, 5, 1, 1e-10, 5e-10, 300)
 
 plt.plot(t_values, V_values)
 plt.title("applied voltage vs time")
@@ -97,3 +97,6 @@ plt.show()
 plt.plot(t_values, J_values)
 plt.title("current vs time")
 plt.show()
+
+
+# %%

@@ -3,7 +3,6 @@ import scipy as sp
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 from scipy import interpolate
-
 # constants
 kB = 1.38e-23
 e = 1.6021e-19
@@ -66,7 +65,7 @@ def solveTwoTransistor(t_values, V_values, R, C, Js1, Js2, T):
         for i in t:
             index.append(sp.where(t_values == i)[0][0])
 
-        return kB*T/e*sp.log(((Js2/Js1) * sp.exp(2*e*q_values[index]/(C*kB*T)) + sp.exp(e*(q_values[index]/C+V1_values[index])/(kB*T))) / ((Js2/Js1) * sp.exp(2*e*q_values[index]/(C*kB*T))+1))
+        return kB*T/e*sp.log(((Js2/Js1) * sp.exp(2*e*q_values[index]/(C*kB*T)) + sp.exp(e*(q_values[index]/C + V1_values[index])/(kB*T))) / ((Js2/Js1) * sp.exp(2*e*q_values[index]/(C*kB*T))+1))
 
     Vn_values = Vn(t_values)
 
@@ -80,13 +79,13 @@ def solveTwoTransistor(t_values, V_values, R, C, Js1, Js2, T):
 
     J2_values = transJ2(t_values)
 
-    return Vn_values, J2_values
+    return Vn_values, J2_values, q_values
 
 #%%
-t_values = sp.linspace(0, 30, 200)
-V_values = sp.concatenate([sp.zeros(50), sp.ones(150)])
+t_values = sp.linspace(0, 30, 400)
+V_values = sp.concatenate([sp.zeros(100), sp.ones(300)])
 
-Vn_values, J_values = solveTwoTransistor(t_values, V_values, 5, 1, 1e-10, 5e-10, 300)
+Vn_values, J_values, q_values = solveTwoTransistor(t_values, V_values, 1e6, 1e-6, 1e-10, 1e-8, 300)
 
 plt.plot(t_values, V_values)
 plt.title("applied voltage vs time")
@@ -98,5 +97,29 @@ plt.plot(t_values, J_values)
 plt.title("current vs time")
 plt.show()
 
+#%%
+
+def solveVa(t_values, V_values, R, R_ion, C, Js1, Js2, T):
+    Va = [0]
+
+    def f(Va_value, t):
+        index = sp.where(t_values == t)[0][0]
+
+        truncated_t = t_values[0:len(Va) + 1]
+        new_Va = Va + [Va_value]
+
+        Vn_values, J_values, q_values = solveTwoTransistor(truncated_t, new_Va, R_ion, C, Js1, Js2, T)
+
+        return (Va_value - V_values[index] + R*(J_values[index] + Va_value/R_ion - 2*q_values[index]/(R_ion*C)))
+
+    Va_0_guess = 0
+
+    solution = sp.optimize.fsolve(f, Va_0_guess, t_values[1])[0]
+    Va.append(solution)
+
+    for i in range(2, len(t_values)):
+        Va.append(sp.optimize.fsolve(f, Va[-1], t_values[i])[0])
+
+    return Va
 
 # %%

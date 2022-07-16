@@ -197,7 +197,7 @@ def solveVa(t_values, V_values, R, R_ion, C, Js1, Js2, T):
         def integrand2(t):
             return interpolate.interp1d(t_values[0:i+1], Va[0:i+1])(t) * sp.exp(2*t/(R_ion*C))
 
-        integrand_values.append(quad(integrand2, 0, t_values[i])[0])
+        integrand_values.append(integrand_values[-1] + quad(integrand2, t_values[i-1], t_values[i])[0])
 
 
     Vn_values, J_values, q_values = solveTwoTransistor(t_values, Va, R_ion, C, Js1, Js2, T)
@@ -306,22 +306,25 @@ V_values = sp.concatenate([sp.zeros(15), sp.ones(85)])
 # plt.show()
 
 # Resistor and memristor in series
-# Va_values, J_values, I = solveVa(t_values, V_values, 100, 1e7, 1e-6, 1e-7, 1e-5, 300)
-# plt.plot(t_values, Va_values)
-# plt.title("VA vs time")
-# plt.show()
-# plt.plot(t_values, I)
-# plt.title("I vs time")
-# plt.show()
-
-# Two memristors in series
-Va_values, J_values = solveMemristorsInSeries(t_values, V_values, [1e9, 1e-8, 1e-4, 5.46e-14], [3e9, 1e-8, 1.00e-15, 1.13e-11], 300)
+Va_values, J_values, I = solveVa(t_values, V_values, 1, 1e8, 1e-7, 1e-10, 1e-8, 300)
 plt.plot(t_values, Va_values)
 plt.title("VA vs time")
 plt.show()
-plt.plot(t_values, J_values)
-plt.title("J vs time")
+plt.plot(t_values, I)
+plt.title("I vs time")
 plt.show()
+plt.plot(t_values, [a/b for a,b in zip(Va_values, I)])
+plt.title("VA/I vs time")
+plt.show()
+
+# Two memristors in series
+# Va_values, J_values = solveMemristorsInSeries(t_values, V_values, [1e9, 1e-8, 1e-4, 5.46e-14], [3e9, 1e-8, 1.00e-15, 1.13e-11], 300)
+# plt.plot(t_values, Va_values)
+# plt.title("VA vs time")
+# plt.show()
+# plt.plot(t_values, J_values)
+# plt.title("J vs time")
+# plt.show()
 
 # %%
 # do stuff

@@ -85,7 +85,7 @@ def solveTwoTransistor(t_values, V_values, R, C, Js1, Js2, T):
 t_values = sp.linspace(0, 30, 400)
 V_values = sp.concatenate([sp.zeros(100), sp.ones(300)])
 
-Vn_values, J_values, q_values = solveTwoTransistor(t_values, V_values, 1e6, 1e-6, 1e-10, 1e-8, 300)
+Vn_values, J_values, q_values = solveTwoTransistor(t_values, V_values, 3e6, 1e-6, 1e-8, 1e-10, 300)
 
 plt.plot(t_values, V_values)
 plt.title("applied voltage vs time")

@@ -110,8 +110,6 @@ def solveGroundedCapacitor(t_values, V_values, C, transistor1params, transistor2
         J1_value, q1_value = solveTwoTransistorStuff(truncated_t, truncated_V, new_Va, R_ion_a, Ca, Js1a, Js2a, index, "a")
         J2_value, q2_value = solveTwoTransistorStuff(truncated_t, new_Va, sp.zeros(len(Va_values) + 1), R_ion_b, Cb, Js1b, Js2b, index, "b")
 
-        print(C*((Va_value - Va_values[-1])/(t-t_values[index-1]))/(1/(1/(R_ion_a) + 1/(R_ion_b))))
-
         return Va_value + C*((Va_value - Va_values[-1])/(t-t_values[index-1]))/(1/(1/(R_ion_a) + 1/(R_ion_b))) - Va(t, J1_value, J2_value, q1_value, q2_value)
 
     for i in range(1, len(t_values)):
